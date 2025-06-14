@@ -1,5 +1,5 @@
 CXX=g++
-CPPFLAGS=-Wall -g3 -std=c++2a #-fsanitize=address -fno-omit-frame-pointer
+CPPFLAGS=-g3 -Wall -std=c++2a #-fsanitize=address -fno-omit-frame-pointer
 
 DBGFLAGS=-O3 -DNDEBUG
 # LOGFLAGS=-DENABLE_LOG

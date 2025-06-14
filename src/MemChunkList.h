@@ -62,6 +62,7 @@ class MemChunkList
 {
 private:
     std::list<MemChunk *>   mChunks;
+    decltype(mChunks.begin())   mCurrent;
 
 public:
     MemChunkList(uint32_t init_size = 0)
@@ -72,6 +73,8 @@ public:
             auto chunk = mChunks.emplace_back(new MemChunk());
             size -= chunk->getCapacity();
         } while (size > 0);
+
+        mCurrent = mChunks.begin();
     }
 
     ~MemChunkList()
@@ -83,14 +86,20 @@ public:
 
     inline char *alloc(uint32_t size)
     {
-        auto chunk = mChunks.back();
-        char *pos = chunk->alloc(size);
-        if (pos) {
-            return pos;
+        decltype(mCurrent) last = mCurrent;
+        while (mCurrent != mChunks.end())
+        {
+            char *pos = (*mCurrent)->alloc(size);
+            if (pos) {
+                return pos;
+            }
+            last = mCurrent;
+            mCurrent++;
         }
 
-        chunk = mChunks.emplace_back(new MemChunk());
-        return chunk->alloc(size);
+        mChunks.emplace_back(new MemChunk());
+        mCurrent = ++last;
+        return (*mCurrent)->alloc(size);
     }
 
     inline char *alloc(const std::string_view &data)

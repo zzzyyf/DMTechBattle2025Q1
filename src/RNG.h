@@ -8,14 +8,14 @@ namespace dm {
 class RNG
 {
 private:
-    __uint128_t mLehmerState;
+    __uint128_t mLehmerState = 0x1245983174;
 
 public:
     RNG()
     {
         char *buf = (char *)&mLehmerState;
         int rslt = getrandom(buf, 16/*length*/, 0/*flags*/);
-        assert(rslt == 0);
+        assert(rslt == 16);
     }
 
     uint64_t rand()

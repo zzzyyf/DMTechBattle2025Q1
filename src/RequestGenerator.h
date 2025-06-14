@@ -58,7 +58,6 @@ private:
     }
 
 public:
-
     void generateRequest()
     {
         uint32_t size = mRandom.rand() % (request_max_size + 1 - request_min_size) + request_min_size;
@@ -77,6 +76,20 @@ public:
         mValue = mRandom.rand();
     }
 
+    // void generateRequest2()
+    // {
+    //     uint32_t size = 5;
+
+    //     char *data = mChunks.alloc(size + 1);    // for null termination
+    //     assert(data);
+    //     mKey = std::string_view(data, size);
+    //     char *pos = data;
+    //     generateFromID(pos, mNumberEntries++);
+    //     data[size] = 0;
+
+    //     mValue = mRandom.rand();
+    // }
+
     void generateSequence(char *&pos, int size)
     {
         // 0-9a-z has 36 characters.
@@ -93,6 +106,34 @@ public:
             result = result >> 6;
             ++pos;
         }
+    }
+
+    void generateFromID(char *&pos, int id)
+    {
+        // 0-9a-z has 36 characters.
+        // 2'000'000 < 36^5, we need 5 chars for max
+        int divider = 36 * 36 * 36 * 36;
+        for (uint32_t i = 0; i < 5; i++)
+        {
+            *pos = mAlphabets[id / divider];
+            ++pos;
+
+            id = id % divider;
+            divider /= 36;
+        }
+    }
+
+    static uint32_t GetIDFromKey(const std::string_view &key)
+    {
+        uint32_t id = 0;
+        uint32_t base = 1;
+        for (int32_t i = key.size() - 1; i >= 0; i--)
+        {
+            char c = key[i];
+            id += (c < 'a' ? c - '0' : 10 + c - 'a') * base;
+            base *= 36;
+        }
+        return id;
     }
 
 };
